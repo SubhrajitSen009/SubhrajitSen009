@@ -1,0 +1,443 @@
+INCLUDE Irvine32.inc
+.data
+team1 byte 500 DUP (?)
+team2 byte 500 DUP (?)
+temp byte 500 DUP (?)
+player1 byte 500 DUP (?)
+player2 byte 500 DUP (?)
+
+t1 byte 500 DUP(?)
+t2 byte 500 DUP(?)
+overs dword ?
+runs dword ?
+o dword ?
+balls dword ?
+target dword ?
+temp1 dword ?
+
+
+m1 byte "Enter overs ",0
+m2 byte "Enter score ",0
+m3 byte " -----> Again ball ",0
+m4 byte "Runs ",0
+m5 byte "Overs ",0
+m6 byte "Out ",0
+m7 byte "TEAM 2 ",0
+m8 byte "TEAM 1 WIN ",0
+m9 byte "TAM 2 WIN",0
+m10 byte "TIE",0
+m11 byte "TARGET ",0
+m12 byte "TEAM 1 NAME ",0
+m13 byte "TEAM 2 NAME ",0
+m14 byte "player 1 NAME ",0
+m15 byte "player 2 NAME ",0
+m16 byte " IS ON STRIKE ",0
+msg1 byte " choose to bat first",0
+msg2 byte "wrong input ",0
+msg byte " Enter Player New Name ",0
+msg3 byte "Target is ",0
+
+.code
+
+swap proc
+mov ecx,0
+.while ecx<=lengthof player1
+mov al,[player1+ecx]
+mov [temp+ecx],al
+inc ecx
+.endw
+
+mov ecx,0
+.while ecx<=lengthof player2
+mov al,[player2+ecx]
+mov [player1+ecx],al
+
+inc ecx
+.endw
+
+mov ecx,0
+.while ecx<=lengthof temp
+mov al,[temp+ecx]
+mov [player2+ecx],al
+
+inc ecx
+.endw
+
+ret
+exit
+
+swap endp
+
+main PROC
+call clrscr
+
+
+
+
+
+
+
+mov edx,offset m12
+call writestring
+mov edx,offset team1
+mov ecx,sizeof team1
+call readstring
+
+
+call crlf
+
+mov edx,offset m13
+call writestring
+mov edx,offset team2
+mov ecx,sizeof team2
+call readstring
+
+
+call crlf
+
+
+
+
+;...........................................
+mov eax,2
+call randomize
+call randomrange
+
+
+.if(eax==0)
+mov ecx,0
+.while ecx<=lengthof team1
+mov al,[team1+ecx]
+mov [t1+ecx],al
+inc ecx
+.endw
+mov ecx,0
+.while ecx<=lengthof team2
+mov al,[team2+ecx]
+mov [t2+ecx],al
+inc ecx
+.endw
+.elseif(eax==1)
+mov ecx,0
+.while ecx<=lengthof team1
+mov al,[team1+ecx]
+mov [t2+ecx],al
+inc ecx
+.endw
+mov ecx,0
+.while ecx<=lengthof team2
+mov al,[team2+ecx]
+mov [t1+ecx],al
+inc ecx
+.endw
+.else
+mov edx,offset msg2
+call writestring
+.endif
+
+
+
+
+mov edx,offset t1
+call writestring
+mov edx,offset msg1
+call writestring
+call crlf
+
+
+;-------------------------------------------------------------
+
+
+mov edx,offset m1
+call writestring
+call readint 
+mov ebx,eax
+
+mov edx,offset t1
+call writestring
+call crlf
+mov edx,offset m14
+call writestring
+mov edx,offset player1
+mov ecx,sizeof player1
+call readstring
+
+
+call crlf
+mov edx,offset m15
+call writestring
+mov edx,offset player2
+mov ecx,sizeof player2
+call readstring
+
+
+call crlf
+
+mov overs,ebx
+mov runs,0
+mov ecx,1
+mov o,0
+
+.while ecx<=overs
+mov temp1,ecx
+
+mov balls,1
+.while balls<=6
+call crlf
+mov eax,green
+call SetTextColor
+mov edx,offset m2
+call writestring
+mov eax,0
+call readchar
+call writechar
+.if(al=='w')
+inc runs
+dec balls
+.elseif(al=='o')
+inc o
+call crlf
+push ecx
+mov edx,offset msg
+call writestring
+mov edx,offset player1
+mov ecx,sizeof player1
+call readstring
+pop ecx
+call crlf
+.break .if(o==10)
+.elseif(al=='1')
+
+call swap
+
+add runs,1
+.elseif(al=='2')
+add runs,2
+.elseif(al=='3')
+
+call swap
+
+add runs,3
+.elseif(al=='4')
+add runs,4
+.elseif(al=='5')
+
+call swap
+
+add runs,5
+.elseif(al=='6')
+add runs,6
+.elseif(al=='7')
+add runs,7
+dec balls
+.elseif(al=='0')
+add runs,0
+.else
+mov edx ,offset m3
+call writestring
+dec balls
+.endif
+call crlf
+
+
+inc balls 
+.endw
+
+call swap
+mov ecx,temp1
+mov eax,yellow
+call SetTextColor
+call crlf
+.break .if(o==10)
+mov edx,offset player1
+call writestring
+mov edx,offset m16
+call writestring
+mov edx,offset m4
+call writestring
+mov eax,runs
+call writedec
+call crlf
+mov edx,offset m5
+call writestring
+mov eax,ecx
+call writedec
+call crlf
+mov edx,offset m6
+call writestring
+mov eax,o
+call writedec
+mov eax,green
+call SetTextColor
+
+inc ecx
+
+.endw
+mov eax,white
+call SetTextColor
+inc runs
+mov eax,runs
+mov target,eax
+call crlf
+;-----------------------------------------
+
+call crlf
+call crlf
+call crlf
+
+mov edx,offset msg3
+call writestring
+call writedec
+
+
+
+call crlf
+
+
+mov edx,offset t2
+call writestring
+call crlf
+
+mov edx,offset m14
+call writestring
+mov edx,offset player1
+mov ecx,sizeof player1
+call readstring
+
+
+call crlf
+mov edx,offset m15
+call writestring
+mov edx,offset player2
+mov ecx,sizeof player2
+call readstring
+
+
+call crlf
+
+mov runs,0
+mov ecx,1
+mov o,0
+call crlf
+
+.while ecx<=overs
+mov temp1,ecx
+mov eax,green
+call SetTextColor
+mov balls,1
+.while balls<=6
+call crlf
+mov edx,offset m2
+call writestring
+mov eax,0
+
+call readchar
+call writechar
+
+.if(al=='w')
+inc runs
+dec balls
+.elseif(al=='o')
+inc o
+
+call crlf
+push ecx
+mov edx,offset msg
+call writestring
+mov edx,offset player1
+mov ecx,sizeof player1
+call readstring
+pop ecx
+call crlf
+.break .if(o==10)
+.elseif(al=='1')
+
+call swap
+
+add runs,1
+.elseif(al=='2')
+add runs,2
+.elseif(al=='3')
+
+call swap
+
+add runs,3
+.elseif(al=='4')
+add runs,4
+.elseif(al=='5')
+
+call swap
+
+add runs,5
+.elseif(al=='6')
+add runs,6
+.elseif(al=='7')
+add runs,7
+dec balls
+.elseif(al=='0')
+add runs,0
+
+.else
+mov edx ,offset m3
+call writestring
+.endif
+mov ebx,runs
+.break .if(ebx>=target)
+
+
+call crlf
+inc balls 
+.endw
+call swap
+
+
+mov eax,yellow
+call SetTextColor
+.break .if(ebx>=target)
+.break .if(o==10)
+call crlf
+mov ecx,temp1
+mov edx,offset m4
+call writestring
+mov eax,runs
+call writedec
+call crlf
+mov edx,offset m5
+call writestring
+mov eax,ecx
+call writedec
+call crlf
+mov edx,offset m6
+call writestring
+mov eax,o
+call writedec
+
+inc ecx
+mov eax,green
+call SetTextColor
+.endw
+call crlf
+mov ebx,target
+dec target
+
+mov ecx,target
+mov eax,red
+call SetTextColor
+.if(runs>=ebx)
+mov edx,offset m9
+call writestring
+.elseif(runs==ecx)
+mov edx,offset m10
+call writestring
+.else
+mov edx,offset m8
+call writestring
+.endif
+call crlf
+call crlf
+	exit
+
+
+main ENDP
+
+END main
